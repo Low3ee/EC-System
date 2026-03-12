@@ -19,6 +19,7 @@ class Room extends Model
         'room_number',
         'type',
         'default_rent',
+        'capacity',
         'is_available',
     ];
 

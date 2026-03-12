@@ -37,6 +37,8 @@ class PaymentController extends Controller
                 ]);
 
                 $invoice->increment('amount_paid', $validated['amount']);
+                // Refresh the model to get the updated amount_paid from the database
+                $invoice->refresh();
 
                 if (($invoice->amount_due - $invoice->amount_paid) <= 0.01) {
                     $invoice->update(['status' => 'paid']);
