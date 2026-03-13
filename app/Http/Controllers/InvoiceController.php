@@ -2,46 +2,112 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tenant;
 use App\Models\Invoice;
-use Illuminate\Http\Request;
+use App\Models\Room;
+use App\Models\Tenant;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
+    // Existing resource methods (index, create, store, show, edit, update, destroy) would go here.
+    // I will add the requested generateMonthlyInvoices method.
+
+    /**
+     * Generate monthly invoices for all active tenants.
+     */
+    public function generateMonthlyInvoices(Request $request)
+    {
+        // Get all active tenants with their room and room utilities loaded.
+        $activeTenants = Tenant::with('room.utilities')->where('status', 'Active')->whereNotNull('room_id')->get();
+
+        $dueDate = Carbon::now()->addDays(15);
+        $generatedCount = 0;
+
+        DB::beginTransaction();
+        try {
+            foreach ($activeTenants as $tenant) {
+                $room = $tenant->room;
+                if (!$room) {
+                    continue;
+                }
+
+                // Check if an invoice for this tenant for the current month already exists.
+                // A tenant should only have one monthly bill.
+                $existingInvoice = Invoice::where('tenant_id', $tenant->id)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->exists();
+
+                if ($existingInvoice) {
+                    continue;
+                }
+
+                $invoiceItems = [];
+                $totalAmount = 0;
+
+                // 1. Add Rent
+                $invoiceItems[] = [
+                    'description' => 'Monthly Rent',
+                    'amount' => $tenant->base_rent,
+                ];
+                $totalAmount += $tenant->base_rent;
+
+                // 2. Add Utilities (pro-rated if multiple tenants are in the room)
+                $activeTenantsInRoom = $room->tenants()->where('status', 'Active')->count();
+                $numberOfTenants = $activeTenantsInRoom > 0 ? $activeTenantsInRoom : 1;
+
+                foreach ($room->utilities as $utility) {
+                    $description = $utility->pivot->description ?: $utility->name;
+                    $amountPerTenant = $utility->pivot->amount / $numberOfTenants;
+
+                    $invoiceItems[] = [
+                        'description' => $description . ($numberOfTenants > 1 ? ' (pro-rated)' : ''),
+                        'amount' => $amountPerTenant,
+                    ];
+                    $totalAmount += $amountPerTenant;
+                }
+
+                if ($totalAmount <= 0) {
+                    continue;
+                }
+
+                // Create the main invoice record
+                $invoice = Invoice::create([
+                    'room_id' => $room->id,
+                    'tenant_id' => $tenant->id,
+                    'total_amount' => $totalAmount,
+                    'due_date' => $dueDate,
+                    'status' => 'unpaid',
+                ]);
+
+                // Create all invoice items
+                $invoice->items()->createMany($invoiceItems);
+                $generatedCount++;
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'An error occurred during invoice generation. Error: ' . $e->getMessage());
+        }
+
+        if ($generatedCount > 0) {
+            return back()->with('success', "$generatedCount monthly invoices have been generated successfully.");
+        } else {
+            return back()->with('info', 'No new invoices needed to be generated. All active tenants are up to date for this month.');
+        }
+    }
+
     public function index()
     {
-        $invoices = Invoice::with('tenant')->latest()->get();
+        $invoices = Invoice::with('tenant', 'room')->latest()->paginate(15);
         return view('invoices.index', compact('invoices'));
     }
 
-    public function generateMonthlyInvoices()
+    public function show(Invoice $invoice)
     {
-        $tenants = Tenant::where('is_active', true)->get();
-        $count = 0;
-        $month = Carbon::now()->format('F Y');
-
-        foreach ($tenants as $tenant) {
-            // Check if tenant already has a 'rent' invoice for this month
-            $exists = Invoice::where('tenant_id', $tenant->id)
-                ->where('type', 'rent')
-                ->whereMonth('due_date', Carbon::now()->month)
-                ->whereYear('due_date', Carbon::now()->year)
-                ->exists();
-
-            if (!$exists) {
-                Invoice::create([
-                    'tenant_id' => $tenant->id,
-                    'amount_due' => $tenant->base_rent,
-                    'amount_paid' => 0,
-                    'due_date' => Carbon::now()->day($tenant->due_day),
-                    'type' => 'rent',
-                    'status' => 'unpaid',
-                ]);
-                $count++;
-            }
-        }
-
-        return redirect()->back()->with('success', "$count invoices generated for $month!");
+        $invoice->load('items', 'tenant', 'room');
+        return view('invoices.show', compact('invoice'));
     }
 }

@@ -17,21 +17,25 @@ class PaymentController extends Controller
         // 1. Validation: Ensure the math makes sense
         $validated = $request->validate([
             'amount' => [
-                'required', 
-                'numeric', 
-                'min:0.01', 
-                'max:' . ($invoice->amount_due - $invoice->amount_paid) 
+                'required',
+                'numeric',
+                'min:0.01',
+                'max:' . $invoice->amountDue
             ],
-            'payment_method' => 'required|string|in:cash,venmo,bank_transfer,stripe',
+            'type' => 'required|string|in:rent,utility',
+            'description' => 'nullable|string|max:255',
+            'payment_method' => 'nullable|string|in:cash,venmo,bank_transfer,stripe',
             'transaction_reference' => 'nullable|string|max:255',
         ]);
 
         try {
             DB::transaction(function () use ($invoice, $validated) {
-                
+
                 $invoice->payments()->create([
                     'amount' => $validated['amount'],
-                    'payment_method' => $validated['payment_method'],
+                    'type' => $validated['type'],
+                    'description' => $validated['description'] ?? null,
+                    'payment_method' => $validated['payment_method'] ?? 'cash',
                     'transaction_reference' => $validated['transaction_reference'] ?? null,
                     'paid_at' => now(),
                 ]);
@@ -40,7 +44,7 @@ class PaymentController extends Controller
                 // Refresh the model to get the updated amount_paid from the database
                 $invoice->refresh();
 
-                if (($invoice->amount_due - $invoice->amount_paid) <= 0.01) {
+                if ($invoice->amountDue <= 0.01) {
                     $invoice->update(['status' => 'paid']);
                 } else {
                     $invoice->update(['status' => 'partial']);

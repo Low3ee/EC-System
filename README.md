@@ -1,8 +1,8 @@
-# Renters and Boarders Easy Collection System 🏠
+# Renters and Boarders Easy Collection System
 
-A streamlined, web-based CRUD application designed for small-scale landlords and boarding house managers to digitize tenant records and automate rent tracking.
+A streamlined, web-based CRUD application designed for small-scale real estate managers to digitize tenant records and automate rent tracking.
 
-## 📋 Project Overview
+## Project Overview
 Managing rental properties manually via notebooks or spreadsheets often leads to lost records and payment confusion. This system provides a centralized dashboard to manage tenants, assign rooms, and log payments with a clear audit trail.
 
 ### Key Features
@@ -12,15 +12,15 @@ Managing rental properties manually via notebooks or spreadsheets often leads to
 - **Status Monitoring**: Visual indicators for 'Paid', 'Partial', and 'Overdue' statuses.
 - **Payment History**: A dedicated ledger for every tenant.
 
-## 🛠️ Tech Stack
+## Tech Stack
 - **Backend**: Laravel 12 (PHP 8.x)
 - **Frontend**: Blade Templates & Tailwind CSS
-- **Database**: MySQL (or SQLite for development)
+- **Database**: MySQL
 - **Tools**: Composer, NPM, Vite
 
 
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - PHP >= 8.2
@@ -31,8 +31,8 @@ Managing rental properties manually via notebooks or spreadsheets often leads to
 ### Installation
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/yourusername/renters-collection-system.git](https://github.com/yourusername/renters-collection-system.git)
-   cd renters-collection-system
+   git clone [https://github.com/Low3ee/EC-System](https://github.com/Low3ee/EC-System)
+   cd EC-System
 
 2. **Install Dependencies**
     ```bash 

@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invoices', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
-    $table->decimal('amount_due', 10, 2);
-    $table->decimal('amount_paid', 10, 2)->default(0);
-    $table->date('due_date');
-    $table->enum('type', ['rent', 'utility', 'deposit', 'fine'])->default('rent');
-    $table->enum('status', ['unpaid', 'partial', 'paid', 'overdue'])->default('unpaid');
-    $table->text('notes')->nullable();
-    $table->timestamps();
-});
+            $table->id();
+            $table->foreignId('room_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->decimal('total_amount', 10, 2);
+            $table->decimal('amount_paid', 10, 2)->default(0);
+            $table->date('due_date');
+            $table->enum('status', ['unpaid', 'partial', 'paid', 'overdue'])->default('unpaid');
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**

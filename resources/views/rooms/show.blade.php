@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    // Fetch all available utilities for the dropdown
+    $allUtilities = \App\Models\Utility::all();
+@endphp
 <div class="max-w-4xl mx-auto">
     <div class="mb-6 flex justify-between items-center">
         <div>
@@ -38,7 +42,75 @@
         </div>
     </div>
 
+    {{-- Utilities Section --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {{-- Add Utility Form --}}
+        <div class="md:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Add Utility Bill</h3>
+            <form action="{{ route('rooms.utilities.store', $room) }}" method="POST">
+                @csrf
+                <div class="mb-4" x-data="{ selectedUtility: '{{ $allUtilities->first()->id ?? '' }}', utilities: {{ $allUtilities->keyBy('id') }} }">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Utility Type</label>
+                    <select name="utility_id" x-model="selectedUtility" class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring focus:ring-brand focus:ring-opacity-50 border p-2">
+                        @foreach($allUtilities as $utility)
+                            <option value="{{ $utility->id }}">{{ $utility->name }}</option>
+                        @endforeach
+                    </select>
 
+                    <div x-show="utilities[selectedUtility] && utilities[selectedUtility].name === 'Other'" x-transition class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <input type="text" name="description" class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring focus:ring-brand focus:ring-opacity-50 border p-2" placeholder="e.g. Aircon Maintenance Fee">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Amount (₱)</label>
+                    <input type="number" step="0.01" name="amount" class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring focus:ring-brand focus:ring-opacity-50 border p-2" placeholder="0.00" required>
+                </div>
+                <button type="submit" class="w-full bg-gray-800 text-white font-medium py-2 rounded-lg hover:bg-gray-900 transition">
+                    Add Utility
+                </button>
+            </form>
+        </div>
+
+        {{-- Assigned Utilities List --}}
+        <div class="md:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gray-800">Assigned Utilities</h2>
+                <span class="text-sm text-gray-500">Total: ₱{{ number_format($room->utilities->sum('pivot.amount'), 2) }}</span>
+            </div>
+            
+            @if($room->utilities->count() > 0)
+                <ul class="divide-y divide-gray-100">
+                    @foreach($room->utilities as $utility)
+                        <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                            <div>
+                                <p class="font-medium text-gray-900">{{ $utility->name }}
+                                    @if($utility->name === 'Other' && $utility->pivot->description)
+                                        <span class="text-gray-500 font-normal">- {{ $utility->pivot->description }}</span>
+                                    @endif
+                                </p>
+                                <p class="text-sm text-gray-500">Monthly: ₱{{ number_format($utility->pivot->amount, 2) }}</p>
+                            </div>
+                            <form action="{{ route('rooms.utilities.destroy', [$room, $utility]) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-medium">Remove</button>
+                            </form>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <div class="p-8 text-center text-gray-500">
+                    <p>No utilities assigned to this room yet.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+    
+    @push('scripts')
+    <script src="//unpkg.com/alpinejs" defer></script>
+    @endpush
+    
     {{-- Current Tenants List --}}
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">

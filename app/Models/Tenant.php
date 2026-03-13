@@ -15,8 +15,14 @@ class Tenant extends Model
         'room_id', 
         'base_rent', 
         'due_day', 
-        'lease_start', 
-        'is_active'
+        'lease_start',
+        'status',
+        'move_out_date',
+    ];
+
+    protected $casts = [
+        'lease_start' => 'date',
+        'move_out_date' => 'date',
     ];
 
     /**
@@ -41,17 +47,6 @@ class Tenant extends Model
     public function getBalanceAttribute()
     {
         // Total they were supposed to pay minus what they actually paid
-        return $this->invoices->sum('amount_due') - $this->invoices->sum('amount_paid');
+        return $this->invoices->sum('total_amount') - $this->invoices->sum('amount_paid');
     }
-
-    protected static function booted()
-{
-    static::created(function ($tenant) {
-        $tenant->room->update(['is_available' => false]);
-    });
-
-    static::deleted(function ($tenant) {
-        $tenant->room->update(['is_available' => true]);
-    });
-}
 }

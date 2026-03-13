@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Room extends Model
 {
@@ -30,5 +31,15 @@ class Room extends Model
     public function tenants(): HasMany
     {
         return $this->hasMany(Tenant::class);
+    }
+
+    /**
+     * The utilities associated with the room.
+     */
+    public function utilities(): BelongsToMany
+    {
+        return $this->belongsToMany(Utility::class, 'room_utility')
+                    ->withPivot('amount', 'description')
+                    ->withTimestamps();
     }
 }

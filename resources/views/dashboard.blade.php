@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">Boarding House Overview</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Horizon 99 Real Estate Dasboard</h1>
 
         {{-- Stats Cards --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -16,14 +16,14 @@
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
                 <p class="text-sm text-gray-500 uppercase font-bold">Occupied Rooms</p>
-                <p class="text-2xl font-black text-gray-800">{{ $stats['occupied_rooms'] }}</p>
+                <p class="text-2xl font-black text-gray-800">{{ $stats['occupied_rooms'] }} / {{ $stats['rooms']->count() }}</p>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-gray-400">
                 <p class="text-sm text-gray-500 uppercase font-bold">Vacant Single Units</p>
-                <p class="text-2xl font-black text-gray-800">{{ $stats['vacant_rooms'] }}</p>
+                <p class="text-2xl font-black text-gray-800">{{ $stats['available_rooms'] }}</p>
             </div>
              <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-gray-400">
-                <p class="text-sm text-gray-500 uppercase font-bold">Vacant Beds</p>
+                <p class="text-sm text-gray-500 uppercase font-bold">Vacant Bedspacers</p>
                 <p class="text-2xl font-black text-gray-800">{{ $stats['available_beds'] }}</p>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-gray-400">
@@ -36,7 +36,7 @@
 <div class="mb-8">
     <h2 class="text-xl font-bold text-gray-800 mb-4">Room Map</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-        @foreach ($rooms as $room)
+        @foreach ($stats['rooms'] as $room)
             <a href="{{ route('rooms.show', $room) }}" class="block bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-brand transition-all duration-200 ease-in-out">
                 <div class="flex justify-between items-start mb-2">
                     <h3 class="font-bold text-gray-900">Room #{{ $room->room_number }}</h3>

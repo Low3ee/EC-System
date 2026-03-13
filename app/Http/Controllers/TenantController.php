@@ -17,7 +17,8 @@ class TenantController extends Controller
         $status = request()->query('status', 'Active');
 
         $tenantsQuery = Tenant::with(['room', 'invoices']);
-
+        $movedOutTenants = Tenant::where('status', 'Moved Out')->get();
+        
         if ($status === 'Moved Out') {
             $tenantsQuery->where('status', 'Moved Out');
         } else {
@@ -28,7 +29,7 @@ class TenantController extends Controller
 
         $tenants = $tenantsQuery->latest()->get();
 
-        return view('tenants.index', compact('tenants', 'status'));
+        return view('tenants.index', compact('tenants', 'status', 'movedOutTenants'));
     }
 
     /**
@@ -75,7 +76,8 @@ public function store(Request $request)
      */
     public function show(string $id)
     {
-        //
+        $tenant = Tenant::with('invoices.items', 'invoices.payments')->findOrFail($id);
+        return view('tenants.show', compact('tenant'));
     }
 
     /**
@@ -83,7 +85,9 @@ public function store(Request $request)
      */
     public function edit(string $id)
     {
-        //
+        $tenant = Tenant::findOrFail($id);
+        $rooms = Room::all();
+        return view('tenants.edit', compact('tenant', 'rooms'));
     }
 
     /**
@@ -91,7 +95,47 @@ public function store(Request $request)
      */
     public function update(Request $request, string $id)
     {
-        //
+        $tenant = Tenant::findOrFail($id);
+        $originalRoom = $tenant->room;
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:tenants,email,' . $tenant->id,
+            'phone' => 'required|string',
+            'room_id' => 'required|exists:rooms,id',
+            'base_rent' => 'required|numeric',
+            'due_day' => 'required|integer|min:1|max:31',
+            'lease_start' => 'required|date',
+            'status' => 'required|string|in:Active,Moved Out',
+        ]);
+
+        $tenant->update($validated);
+
+        // Handle room change
+        $newRoom = Room::find($validated['room_id']);
+        if ($originalRoom && $originalRoom->id !== $newRoom->id) {
+            // Decrement old room's occupancy
+            if ($originalRoom->tenants()->count() < $originalRoom->capacity) {
+                $originalRoom->update(['is_available' => true]);
+            }
+
+            // Increment new room's occupancy
+            if ($newRoom->tenants()->count() >= $newRoom->capacity) {
+                $newRoom->update(['is_available' => false]);
+            }
+        }
+        
+        if ($validated['status'] == 'Moved Out') {
+            $tenant->update(['room_id' => null]);
+            if ($originalRoom) {
+                if ($originalRoom->tenants()->count() < $originalRoom->capacity) {
+                    $originalRoom->update(['is_available' => true]);
+                }
+            }
+        }
+
+
+        return redirect()->route('tenants.index')->with('success', 'Tenant details updated successfully.');
     }
 
     /**
@@ -105,6 +149,7 @@ public function store(Request $request)
         // Handle Move Out
         $tenant->status = 'Moved Out';
         $tenant->room_id = null; // Detach from room to free up capacity
+        $tenant->move_out_date = now();
         $tenant->save();
 
         // Update Room Availability

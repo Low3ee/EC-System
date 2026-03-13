@@ -41,9 +41,9 @@
                                     <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold uppercase text-[10px]">Occupied</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-800 font-medium">
-                                {{ $room->tenants->first()->name ?? 'N/A' }}
-                            </td>
+                          <td class="px-6 py-4 text-sm text-gray-800 font-medium">
+                                {{ $room->tenants->pluck('name')->implode(', ') ?: 'Vacant' }}
+                          </td>
                             <td class="px-6 py-4 text-right space-x-2">
                                 <a href="{{route('rooms.show', $room->id)}}"><span>View</span></a>
 

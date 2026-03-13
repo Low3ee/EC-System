@@ -6,6 +6,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\RoomUtilityController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -14,6 +15,10 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::resource('rooms', RoomController::class);
+
+// Room Utilities
+Route::post('/rooms/{room}/utilities', [RoomUtilityController::class, 'store'])->name('rooms.utilities.store');
+Route::delete('/rooms/{room}/utilities/{utility}', [RoomUtilityController::class, 'destroy'])->name('rooms.utilities.destroy');
 
 Route::resource('tenants', TenantController::class);
 
