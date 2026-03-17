@@ -14,9 +14,6 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = Room::with('tenants')->orderBy('room_number')->get();
-
-        // todo: Get specific number of bed available in a room
-
         // dd($rooms);
         return view('rooms.index', compact('rooms'));
     }

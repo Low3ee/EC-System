@@ -30,7 +30,6 @@ class PaymentController extends Controller
 
         try {
             DB::transaction(function () use ($invoice, $validated) {
-
                 $invoice->payments()->create([
                     'amount' => $validated['amount'],
                     'type' => $validated['type'],

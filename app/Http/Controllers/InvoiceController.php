@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
-    // Existing resource methods (index, create, store, show, edit, update, destroy) would go here.
-    // I will add the requested generateMonthlyInvoices method.
-
     /**
      * Generate monthly invoices for all active tenants.
      */
@@ -33,7 +30,6 @@ class InvoiceController extends Controller
                     continue;
                 }
 
-                // Check if an invoice for this tenant for the current month already exists.
                 // A tenant should only have one monthly bill.
                 $existingInvoice = Invoice::where('tenant_id', $tenant->id)
                     ->whereYear('created_at', Carbon::now()->year)
