@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/invoices/generate', [InvoiceController::class, 'generateMonthlyInvoices'])->name('invoices.generate');
     Route::resource('invoices', InvoiceController::class);
+    Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+    Route::get('/invoices/{invoice}/email', [InvoiceController::class, 'email'])->name('invoices.email');
 
     Route::post('/invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('payments.store');
 });

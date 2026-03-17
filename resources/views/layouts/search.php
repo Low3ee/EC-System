@@ -18,7 +18,6 @@
     <!-- Dropdown Results -->
     <div id="navbar-search-results" class="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 hidden">
         <div class="py-1" id="search-results-container">
-            <!-- Results injected here via JS -->
         </div>
     </div>
 </div>
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
         spinner.classList.remove('hidden');
 
         timeout = setTimeout(() => {
-            // Use the Laravel route URL (you must define /search/results in routes/web.php)
             axios.get('/search/results', { params: { q: query } })
                 .then(response => {
                     const results = response.data;
@@ -72,10 +70,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(err => console.error(err))
                 .finally(() => spinner.classList.add('hidden'));
-        }, 300); // 300ms debounce
+        }, 300);
     });
 
-    // Close dropdown on outside click
     document.addEventListener('click', function(e) {
         if (!input.contains(e.target) && !resultsDropdown.contains(e.target)) {
             resultsDropdown.classList.add('hidden');

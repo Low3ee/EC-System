@@ -66,88 +66,76 @@
         </table>
     </div>
 
-    <div class="text-center mt-8">
-        <a href="{{ route('invoices.index') }}" class="text-sm text-gray-500 hover:text-brand">← Back to All Invoices</a>
+    @if ($invoice->status != 'paid' && ($invoice->total_amount - $invoice->amount_paid) > 0)
+    <div class="mt-8 border-t pt-8">
+        <h3 class="font-bold text-gray-800 mb-4 text-xl">Record a Payment</h3>
+        <form action="{{ route('payments.store', $invoice) }}" method="POST">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Amount --}}
+                <div class="md:col-span-2">
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                    <div class="mt-1">
+                        <input type="number" name="amount" id="amount" step="0.01" max="{{ $invoice->total_amount - $invoice->amount_paid }}" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-light focus:ring-brand-light sm:text-sm" placeholder="0.00">
+                    </div>
+                     @error('amount')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Type --}}
+                <div>
+                     <label for="type" class="block text-sm font-medium text-gray-700">Payment Type</label>
+                    <select id="type" name="type" required class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand-light focus:outline-none focus:ring-brand-light sm:text-sm">
+                        <option value="rent">Rent</option>
+                        <option value="utility">Utility</option>
+                    </select>
+                </div>
+
+                {{-- Payment Method --}}
+                <div>
+                     <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
+                    <select id="payment_method" name="payment_method" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand-light focus:outline-none focus:ring-brand-light sm:text-sm">
+                        <option value="cash" selected>Cash</option>
+                        <option value="venmo">Venmo</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="stripe">Stripe</option>
+                    </select>
+                </div>
+                
+                {{-- Description --}}
+                <div class="md:col-span-2">
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                    <div class="mt-1">
+                        <textarea name="description" id="description" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-light focus:ring-brand-light sm:text-sm"></textarea>
+                    </div>
+                </div>
+
+                {{-- Transaction Reference --}}
+                <div class="md:col-span-2">
+                    <label for="transaction_reference" class="block text-sm font-medium text-gray-700">Transaction Reference (Optional)</label>
+                    <div class="mt-1">
+                        <input type="text" name="transaction_reference" id="transaction_reference" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-light focus:ring-brand-light sm:text-sm" placeholder="e.g. Venmo transaction ID">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 text-right">
+                <button type="submit" class="bg-brand hover:bg-brand-dark text-white font-bold py-2 px-6 rounded-lg transition">
+                    Record Payment
+                </button>
+            </div>
+        </form>
     </div>
-
-    {{-- Payment Recording Section --}}
-    <div class="mt-12">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Payment History</h3>
-
-        @if($invoice->payments->isEmpty())
-            <p class="text-gray-500 text-sm">No payments have been recorded for this invoice yet.</p>
-        @else
-            <div class="overflow-x-auto mb-8">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="text-gray-500 text-sm border-b-2 border-gray-200">
-                            <th class="px-4 py-3 font-medium">Date</th>
-                            <th class="px-4 py-3 font-medium">Type</th>
-                            <th class="px-4 py-3 font-medium">Description</th>
-                            <th class="px-4 py-3 font-medium text-right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        @foreach($invoice->payments as $payment)
-                            <tr class="text-gray-700 border-b border-gray-100">
-                                <td class="px-4 py-3">{{ $payment->paid_at->format('M d, Y') }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($payment->type) }}</td>
-                                <td class="px-4 py-3">{{ $payment->description }}</td>
-                                <td class="px-4 py-3 text-right">₱{{ number_format($payment->amount, 2) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-
-        @if($invoice->status != 'paid')
-            <div class="mt-8 p-6 bg-gray-50 rounded-lg border">
-                <h4 class="font-bold text-gray-700 mb-4">Record a New Payment</h4>
-                <form action="{{ route('payments.store', $invoice) }}" method="POST">
-                    @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
-                            <input type="number" name="amount" id="amount" step="0.01" required
-                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand sm:text-sm"
-                                placeholder="0.00">
-                            @error('amount')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="type" class="block text-sm font-medium text-gray-700">Payment Type</label>
-                            <select name="type" id="type" required
-                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand sm:text-sm">
-                                <option value="rent">Rent</option>
-                                <option value="utility">Utility</option>
-                            </select>
-                             @error('type')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <div class="md:col-span-2">
-                             <label for="description" class="block text-sm font-medium text-gray-700">Description (Optional)</label>
-                             <input type="text" name="description" id="description"
-                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand sm:text-sm"
-                                placeholder="e.g., February rent">
-                             @error('description')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mt-6 text-center">
-                        <button type="submit"
-                            class="bg-brand-600 border border-black text-black font-bold py-2 px-4 rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
-                            Record Payment
-                        </button>
-                    </div>
-                </form>
-            </div>
-        @endif
+    @endif
+    <div class="text-center mt-8 flex justify-center space-x-4">
+        <a href="{{ route('invoices.print', $invoice) }}" target="_blank" class="bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600">
+            Print Receipt
+        </a>
+        <a href="{{ route('invoices.email', $invoice) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600">
+            Email Receipt
+        </a>
     </div>
 </div>
 @endsection
+

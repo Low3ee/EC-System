@@ -77,6 +77,7 @@
                         <th class="px-6 py-3">Tenant</th>
                         <th class="px-6 py-3">Method</th>
                         <th class="px-6 py-3">Amount</th>
+                        <th class="px-6 py-3">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -86,6 +87,7 @@
                         <td class="px-6 py-4 text-sm font-bold text-gray-800">{{ $payment->invoice->tenant->name }}</td>
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded capitalize">{{ $payment->payment_method }}</span></td>
                         <td class="px-6 py-4 text-sm font-bold text-green-600">+₱{{ number_format($payment->amount, 2) }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600"><a href="{{route('invoices.show', $payment->invoice->id)}}" class="text-brand hover:underline">View Invoice</a></td>
                     </tr>
                     @empty
                     <tr>

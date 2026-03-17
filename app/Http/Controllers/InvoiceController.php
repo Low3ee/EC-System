@@ -8,6 +8,8 @@ use App\Models\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Blade;
 
 class InvoiceController extends Controller
 {
@@ -43,14 +45,14 @@ class InvoiceController extends Controller
                 $invoiceItems = [];
                 $totalAmount = 0;
 
-                // 1. Add Rent
+                // Add Rent
                 $invoiceItems[] = [
                     'description' => 'Monthly Rent',
                     'amount' => $tenant->base_rent,
                 ];
                 $totalAmount += $tenant->base_rent;
 
-                // 2. Add Utilities (pro-rated if multiple tenants are in the room)
+                // Add Utilities (pro-rated if multiple tenants are in the room)
                 $activeTenantsInRoom = $room->tenants()->where('status', 'Active')->count();
                 $numberOfTenants = $activeTenantsInRoom > 0 ? $activeTenantsInRoom : 1;
 
@@ -105,5 +107,33 @@ class InvoiceController extends Controller
     {
         $invoice->load('items', 'tenant', 'room');
         return view('invoices.show', compact('invoice'));
+    }
+
+    public function print(Invoice $invoice)
+    {
+        $invoice->load('items', 'tenant', 'room');
+        return view('invoices.receipt', compact('invoice'));
+    }
+
+    public function email(Invoice $invoice)
+    {
+        $invoice->load('items', 'tenant', 'room');
+
+        if (!$invoice->tenant || !$invoice->tenant->email) {
+            return back()->with('error', 'Tenant has no email address configured.');
+        }
+
+        try {
+            Mail::send([], [], function ($message) use ($invoice) {
+        $message->to($invoice->tenant->email)
+                ->subject("Invoice #{$invoice->id}")
+                // This renders your existing blade view into the email body
+                ->html(view('invoices.receipt', compact('invoice'))->render());
+    });
+
+            return back()->with('success', "Invoice #{$invoice->id} has been emailed to {$invoice->tenant->email}.");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
     }
 }

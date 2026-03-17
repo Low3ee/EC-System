@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Tenant Directory</h1>
-        <a href="{{ route('tenants.create') }}" class="bg-brand text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+        <a href="{{ route('tenants.create') }}" class="bg-brand text-black px-4 py-2 rounded-lg shadow hover:bg-blue-700 hover:text-white transition">
             + Add New Tenant
         </a>
     </div>

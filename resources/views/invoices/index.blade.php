@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-gray-800">Invoices & Billing</h1>
         <form action="{{ route('invoices.generate') }}" method="POST">
             @csrf
-            <button type="submit" class="bg-brand text-white font-medium py-2 px-4 rounded-lg hover:bg-brand-dark transition">
+            <button type="submit" class="bg-brand text-black font-medium py-2 px-4 border rounded-lg hover:bg-brand-dark transition">
                 Generate Monthly Invoices
             </button>
         </form>
@@ -44,6 +44,8 @@
                             </td>
                             <td class="px-6 py-4">
                                 <a href="{{ route('invoices.show', $invoice) }}" class="text-brand hover:underline">View Details</a>
+                                <a href="{{ route('invoices.email', $invoice) }}" class="text-brand hover:underline">Email Invoice</a>
+                                <a href="{{ route('invoices.print', $invoice) }}" target="_blank" class="text-brand hover:underline">Print Invoice</a>
                             </td>
                         </tr>
                     @empty

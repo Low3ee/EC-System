@@ -53,3 +53,8 @@ Managing rental properties manually via notebooks or spreadsheets often leads to
 5. **Start Development Server**
     ```bash 
     php artisan serve
+
+
+**SMTP for testing**
+```bash 
+    Rnwood.Smtp4dev
