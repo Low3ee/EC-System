@@ -55,7 +55,7 @@
                     </div>
 
                     <div class="flex-1 flex justify-center px-4 lg:px-6">
-                        <!-- The search form will be here. -->
+                        @include('layouts.search')
                     </div>
 
                     <div class="flex items-center">

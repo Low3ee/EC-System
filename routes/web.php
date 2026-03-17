@@ -8,11 +8,15 @@ use App\Http\Controllers\TenantController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\RoomUtilityController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         return redirect()->route('dashboard');
     });
+
+
+    Route::get('/search/results', [SearchController::class, 'search'])->name('search.results');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
