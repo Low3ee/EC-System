@@ -1,0 +1,56 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '$_REGION-docker.pkg.dev/$PROJECT_ID/$_SERVICE_NAME/$_SERVICE_NAME:$COMMIT_SHA', '.']
+
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '$_REGION-docker.pkg.dev/$PROJECT_ID/$_SERVICE_NAME/$_SERVICE_NAME:$COMMIT_SHA']
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '$_SERVICE_NAME'
+      - '--image'
+      - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_SERVICE_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - '--region'
+      - '$_REGION'
+      - '--platform'
+      - 'managed'
+      - '--port'
+      - '8080'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'APP_KEY=${_APP_KEY}'
+      - '--set-env-vars'
+      - 'APP_URL=${_APP_URL}'
+      - '--set-env-vars'
+      - 'DB_CONNECTION=${_DB_CONNECTION}'
+      - '--set-env-vars'
+      - 'DB_HOST=${_DB_HOST}'
+      - '--set-env-vars'
+      - 'DB_PORT=${_DB_PORT}'
+      - '--set-env-vars'
+      - 'DB_DATABASE=${_DB_DATABASE}'
+      - '--set-env-vars'
+      - 'DB_USERNAME=${_DB_USERNAME}'
+      - '--set-env-vars'
+      - 'DB_PASSWORD=${_DB_PASSWORD}'
+images:
+  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_SERVICE_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+options:
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _SERVICE_NAME: 'your-service-name'
+  _REGION: 'your-region'
+  _APP_KEY: 'your-app-key'
+  _APP_URL: 'your-app-url'
+  _DB_CONNECTION: 'mysql'
+  _DB_HOST: 'your-db-host'
+  _DB_PORT: '3306'
+  _DB_DATABASE: 'your-db-database'
+  _DB_USERNAME: 'your-db-username'
+  _DB_PASSWORD: 'your-db-password'

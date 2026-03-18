@@ -33,7 +33,7 @@
 
                 <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
                     @csrf
-
+                    
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-500 mb-2 ml-1 tracking-wider">Registered Email Address</label>
                         <x-text-input id="email" class="block w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 focus:border-indigo-500 focus:bg-white focus:ring-0 rounded-2xl transition-all font-medium text-gray-700" 
