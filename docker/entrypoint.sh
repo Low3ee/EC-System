@@ -1,7 +1,12 @@
 #!/bin/sh
 set -e
 
-# Replace ${PORT} with the value of the PORT environment variable in the nginx config
-envsubst '${PORT}' < /etc/nginx/sites-available/default > /etc/nginx/sites-available/default.tmp && mv /etc/nginx/sites-available/default.tmp /etc/nginx/sites-available/default
+echo "Starting container entrypoint..."
+echo "PORT is set to: $PORT"
 
+echo "Substituting PORT in nginx config..."
+envsubst '${PORT}' < /etc/nginx/sites-available/default > /etc/nginx/sites-available/default.tmp && mv /etc/nginx/sites-available/default.tmp /etc/nginx/sites-available/default
+echo "Nginx config updated."
+
+echo "Starting supervisord..."
 exec "$@"
