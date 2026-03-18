@@ -128,7 +128,7 @@ class InvoiceController extends Controller
         $message->to($invoice->tenant->email)
                 ->subject("Invoice #{$invoice->id}")
                 // This renders your existing blade view into the email body
-                ->html(view('invoices.receipt', compact('invoice'))->render());
+                ->html(view('invoices.email-receipt', compact('invoice'))->render());
     });
 
             return back()->with('success', "Invoice #{$invoice->id} has been emailed to {$invoice->tenant->email}.");

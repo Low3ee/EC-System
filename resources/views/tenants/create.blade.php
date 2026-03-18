@@ -9,20 +9,28 @@
 
     <form action="{{ route('tenants.store') }}" method="POST" class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
         @csrf
-
+        @if ($errors->any())
+            <div class="alert alert-danger text-red-600 font-bold">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" name="name" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
+                <input type="text" name="name" value="{{ old('name') }}" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                <input type="email" name="email" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
+                <input type="email" name="email" value="{{ old('email') }}" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                <input type="text" name="phone" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
+                <input type="text" name="phone" value="{{ old('phone') }}" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
             </div>
 
             <div>
@@ -40,21 +48,21 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Base Rent (₱)</label>
                 {{-- Added id="base_rent" here --}}
-                <input type="number" name="base_rent" id="base_rent" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand" placeholder="5000" value="">
+                <input type="number" name="base_rent" id="base_rent" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand" placeholder="5000" value="" readonly>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Due Day</label>
-                <input type="number" name="due_day" min="1" max="31" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand" placeholder="1 to 31">
+                <input type="number" name="due_day" value="{{ old('due_day') }}" min="1" max="31" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand" placeholder="1 to 31">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Lease Start Date</label>
-                <input type="date" name="lease_start" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
+                <input type="date" name="lease_start" value="{{ old('lease_start') }}" required class="w-full rounded-lg border-gray-300 focus:border-brand focus:ring-brand">
             </div>
         </div>
 
         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-            <button type="submit" class="bg-brand text-white px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition">
+            <button type="submit" class="bg-brand text-black px-8 py-3 rounded-lg font-bold shadow-lg hover:text-white hover:bg-blue-700 transition">
                 Save Tenant & Assign Room
             </button>
         </div>

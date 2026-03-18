@@ -61,7 +61,7 @@
         </div>
 
         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-            <button type="submit" class="bg-brand text-white px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition">
+            <button type="submit" class="bg-brand text-black px-8 py-3 rounded-lg font-bold shadow-lg hover:text-white hover:bg-blue-700 transition">
                 Save Changes
             </button>
         </div>

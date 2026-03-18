@@ -46,7 +46,7 @@
 
         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
             <a href="{{ route('rooms.index') }}" class="px-8 py-3 text-gray-600 hover:text-gray-800 mr-4">Cancel</a>
-            <button type="submit" class="bg-brand text-white px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition">
+            <button type="submit" class="bg-brand text-black px-8 py-3 rounded-lg font-bold shadow-lg hover:text-white hover:bg-blue-700 transition">
                 Save Room
             </button>
         </div>
