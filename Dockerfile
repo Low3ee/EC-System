@@ -36,7 +36,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # Install supervisord
     supervisor \
     # Install nginx
-    nginx
+    nginx \
+    # Install gettext for envsubst
+    gettext
 
 # Install extensions
 RUN docker-php-ext-install pdo_mysql zip
@@ -58,25 +60,21 @@ USER root
 COPY docker/php.ini /usr/local/etc/php/conf.d/40-laravel.ini
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/nginx.conf /etc/nginx/sites-available/default
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
-
     # Change user for nginx and php-fpm
-
     sed -i 's|user www-data;|user laravel;|g' /etc/nginx/nginx.conf && \
-
     sed -i 's|user = www-data|user = laravel|g' /usr/local/etc/php-fpm.d/www.conf && \
-
     sed -i 's|group = www-data|group = laravel|g' /usr/local/etc/php-fpm.d/www.conf && \
-
     # Give laravel user permission to storage and bootstrap/cache
-
     chown -R laravel:laravel /var/www/html/storage /var/www/html/bootstrap/cache && \
-
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port
 EXPOSE 8080
 
 # Entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/bin/supervisord"]
