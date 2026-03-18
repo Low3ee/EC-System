@@ -28,13 +28,13 @@ RUN npm run build
 FROM php:8.2-fpm
 
 # Install packages
-RUN apt-get update && apt-get install -y --no-install-recommends 
+RUN apt-get update && apt-get install -y --no-install-recommends \
     # Install dependencies for other extensions
-    libzip-dev 
+    libzip-dev \
     # Install git
-    git 
+    git \
     # Install supervisord
-    supervisor 
+    supervisor \
     # Install nginx
     nginx
 
