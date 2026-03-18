@@ -59,32 +59,20 @@ COPY docker/php.ini /usr/local/etc/php/conf.d/40-laravel.ini
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && 
-    # Change document root for nginx
-    sed -i 's|/var/www/html;|/var/www/html/public;|g' /etc/nginx/sites-available/default && 
-    # Remove default server block
-    sed -i '/server_name _;/d' /etc/nginx/sites-available/default && 
-    # Add laravel server block
-    sed -i '15 i \    server_name _; 
+RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
 
-    location / { 
-        try_files $uri $uri/ /index.php?$query_string; 
-    } 
-
-    location ~ \.php$ { 
-        include snippets/fastcgi-php.conf; 
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock; 
-    } 
-
-    location ~ /\.ht { 
-        deny all; 
-    }' /etc/nginx/sites-available/default && 
     # Change user for nginx and php-fpm
-    sed -i 's|user www-data;|user laravel;|g' /etc/nginx/nginx.conf && 
-    sed -i 's|user = www-data|user = laravel|g' /usr/local/etc/php-fpm.d/www.conf && 
-    sed -i 's|group = www-data|group = laravel|g' /usr/local/etc/php-fpm.d/www.conf && 
+
+    sed -i 's|user www-data;|user laravel;|g' /etc/nginx/nginx.conf && \
+
+    sed -i 's|user = www-data|user = laravel|g' /usr/local/etc/php-fpm.d/www.conf && \
+
+    sed -i 's|group = www-data|group = laravel|g' /usr/local/etc/php-fpm.d/www.conf && \
+
     # Give laravel user permission to storage and bootstrap/cache
-    chown -R laravel:laravel /var/www/html/storage /var/www/html/bootstrap/cache && 
+
+    chown -R laravel:laravel /var/www/html/storage /var/www/html/bootstrap/cache && \
+
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port
