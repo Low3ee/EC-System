@@ -83,7 +83,7 @@
                     </div>
 
                     <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-200 transition-all hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-sm">
-                        Enter EC System
+                        Access My Dashboard
                     </button>
                 </form>
 

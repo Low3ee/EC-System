@@ -97,9 +97,9 @@
                      <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
                     <select id="payment_method" name="payment_method" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-brand-light focus:outline-none focus:ring-brand-light sm:text-sm">
                         <option value="cash" selected>Cash</option>
-                        <option value="venmo">Venmo</option>
+                        <option value="gcash">Gcash</option>
                         <option value="bank_transfer">Bank Transfer</option>
-                        <option value="stripe">Stripe</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
                 
@@ -115,7 +115,7 @@
                 <div class="md:col-span-2">
                     <label for="transaction_reference" class="block text-sm font-medium text-gray-700">Transaction Reference (Optional)</label>
                     <div class="mt-1">
-                        <input type="text" name="transaction_reference" id="transaction_reference" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-light focus:ring-brand-light sm:text-sm" placeholder="e.g. Venmo transaction ID">
+                        <input type="text" name="transaction_reference" id="transaction_reference" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-light focus:ring-brand-light sm:text-sm" placeholder="e.g. Gcash Reference No.">
                     </div>
                 </div>
             </div>

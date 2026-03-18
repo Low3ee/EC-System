@@ -127,7 +127,6 @@ class InvoiceController extends Controller
             Mail::send([], [], function ($message) use ($invoice) {
         $message->to($invoice->tenant->email)
                 ->subject("Invoice #{$invoice->id}")
-                // This renders your existing blade view into the email body
                 ->html(view('invoices.email-receipt', compact('invoice'))->render());
     });
 
