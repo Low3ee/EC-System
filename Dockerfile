@@ -59,7 +59,7 @@ COPY docker/php.ini /usr/local/etc/php/conf.d/40-laravel.ini
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
 
     # Change user for nginx and php-fpm
 
